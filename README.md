@@ -136,7 +136,7 @@ The `github-pages/index.html` is a fully self-contained static demo that simulat
 
 - 📍 Greater Sudbury, ON, Canada
 - 📧 rashed06cse@gmail.com
-- 💼 [linkedin.com/in/rashed-azad](https://linkedin.com/in/rashed-azad)
+- 💼 [[linkedin.com/in/rashed-azad](https://linkedin.com/in/rashed-azad](https://www.linkedin.com/in/md-rashed-azad-chowdhury-pmp%C2%AE-a145325a/))
 - 🎓 MSc Computational Science — Laurentian University
 
 ---
