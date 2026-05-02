@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="TSF Real-Time Monitoring Dashboard — Smart & Sustainable Mining Lab, Laurentian University. Built by Md Rashed Azad Chowdhury, WordPress Web Developer.">
+<meta property="og:title" content="TSF Monitor Dashboard — SSML Laurentian University">
+<meta property="og:description" content="Production WordPress dashboard for real-time Tailings Storage Facility sensor monitoring.">
+<meta property="og:type" content="website">
+<title>TSF Monitor Dashboard — SSML · Laurentian University</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ore:#1a1a2e;--deep:#0f3460;--teal:#00b4d8;--teal-l:#90e0ef;
+  --amber:#e9c46a;--danger:#e63946;--safe:#2dc653;
+  --surface:#16213e;--card:#1e2d4a;--text:#caf0f8;--muted:#8ab4c2;
+  --border:rgba(0,180,216,0.18);
+  --fd:'Space Mono',monospace;--fb:'DM Sans',sans-serif;
+  --r:8px;--rl:14px;--tr:0.22s cubic-bezier(.4,0,.2,1);
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--ore);color:var(--text);font-size:16px;line-height:1.7;overflow-x:hidden}
+a{color:var(--teal);text-decoration:none;transition:color var(--tr)}
+a:hover{color:var(--teal-l)}
+h1,h2,h3,h4{font-family:var(--fd);line-height:1.3}
+.c{max-width:1100px;margin:0 auto;padding:0 1.5rem}
+.sec{padding:5rem 0}
+.sec-sm{padding:3rem 0}
+
+/* HEADER */
+#hdr{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,10,30,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);transition:background var(--tr)}
+.hi{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;max-width:1100px;margin:0 auto}
+.sl{display:flex;align-items:center;gap:12px}
+.li{width:38px;height:38px;border-radius:var(--r);background:linear-gradient(135deg,var(--teal),var(--deep));display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:12px;color:#fff}
+.lt{font-family:var(--fd);font-size:13px;color:var(--teal-l);line-height:1.2}
+.ls{font-size:10px;color:var(--muted);font-family:var(--fb)}
+.nav{display:flex;gap:2rem;align-items:center}
+.nav a{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;transition:color var(--tr)}
+.nav a:hover{color:var(--teal)}
+.nc{padding:7px 18px;border:1px solid var(--teal);border-radius:20px;font-size:12px;color:var(--teal)!important;transition:all var(--tr)!important}
+.nc:hover{background:var(--teal);color:var(--ore)!important}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;align-items:center;padding-top:80px;background:radial-gradient(ellipse 60% 50% at 70% 40%,rgba(0,180,216,.08) 0%,transparent 70%),radial-gradient(ellipse 40% 60% at 20% 70%,rgba(15,52,96,.4) 0%,transparent 60%),var(--ore);overflow:hidden}
+.hg{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.htag{display:inline-flex;align-items:center;gap:8px;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--teal);border:1px solid var(--border);padding:5px 14px;border-radius:20px;margin-bottom:1.5rem;background:rgba(0,180,216,.06)}
+.pd{width:7px;height:7px;border-radius:50%;background:var(--safe);animation:pulse 2s ease-in-out infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.ht{font-size:clamp(2rem,4vw,3rem);color:#fff;margin-bottom:1rem;line-height:1.15}
+.ht span{color:var(--teal)}
+.hd{color:var(--muted);font-size:1.05rem;margin-bottom:2rem;max-width:480px}
+.ha{display:flex;gap:1rem;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:var(--r);font-size:14px;font-weight:500;cursor:pointer;transition:all var(--tr);border:none;font-family:var(--fb)}
+.bp{background:var(--teal);color:var(--ore)}
+.bp:hover{background:var(--teal-l);color:var(--ore);transform:translateY(-2px)}
+.bo{background:transparent;color:var(--text);border:1px solid var(--border)}
+.bo:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-2px)}
+
+/* MOCKUP */
+.dm{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.5),0 0 0 1px rgba(0,180,216,.1);animation:float 6s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.mb{background:var(--surface);padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.md{width:10px;height:10px;border-radius:50%}
+.mtl{font-family:var(--fd);font-size:11px;color:var(--muted);margin-left:8px}
+.mby{padding:1rem}
+.ms{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.mst{background:var(--surface);border-radius:var(--r);padding:10px;border:1px solid var(--border)}
+.msv{font-family:var(--fd);font-size:18px;font-weight:700}
+.msl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+.mch{background:var(--surface);border-radius:var(--r);padding:12px;border:1px solid var(--border)}
+.chl{font-size:10px;color:var(--muted);margin-bottom:8px;font-family:var(--fd)}
+.sb{display:inline-flex;align-items:center;gap:5px;font-size:10px;padding:3px 10px;border-radius:12px;text-transform:uppercase;letter-spacing:.06em}
+.ss{background:rgba(45,198,83,.15);color:var(--safe)}
+.sw{background:rgba(233,196,106,.15);color:var(--amber)}
+.sd{background:rgba(230,57,70,.15);color:var(--danger)}
+
+/* SECTION HEADINGS */
+.sl2{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--teal);margin-bottom:.75rem}
+.st{font-size:clamp(1.6rem,3vw,2.2rem);color:#fff;margin-bottom:1rem}
+.st span{color:var(--teal)}
+.sdesc{color:var(--muted);max-width:560px}
+
+/* FEATURES */
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-top:3rem}
+.fc{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:1.75rem;transition:all var(--tr);position:relative;overflow:hidden}
+.fc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--teal),transparent);opacity:0;transition:opacity var(--tr)}
+.fc:hover{border-color:rgba(0,180,216,.35);transform:translateY(-4px)}
+.fc:hover::before{opacity:1}
+.fi{width:44px;height:44px;border-radius:var(--r);background:rgba(0,180,216,.1);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:1rem}
+.ft{font-family:var(--fd);font-size:14px;color:#fff;margin-bottom:.5rem}
+.fd2{font-size:14px;color:var(--muted);line-height:1.6}
+
+/* TECH */
+.tg{display:flex;flex-wrap:wrap;gap:10px;margin-top:2rem}
+.tp{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:13px;border:1px solid var(--border);background:var(--card);color:var(--text);transition:all var(--tr)}
+.tp:hover{border-color:var(--teal);color:var(--teal)}
+.tpd{width:6px;height:6px;border-radius:50%;background:var(--teal)}
+
+/* METRICS */
+.mg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem;margin-top:3rem}
+.mc{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:1.75rem;text-align:center}
+.mn{font-family:var(--fd);font-size:2.5rem;color:var(--teal);font-weight:700;line-height:1}
+.mu{font-size:14px;color:var(--muted);margin-top:.25rem}
+.ml{font-size:13px;color:var(--muted);margin-top:.5rem}
+
+/* ARCH */
+.af{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin-top:3rem}
+.an{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:1.25rem 1.5rem;text-align:center;min-width:130px}
+.ani{font-size:24px;margin-bottom:.5rem}
+.ant{font-family:var(--fd);font-size:11px;color:var(--teal)}
+.and{font-size:10px;color:var(--muted);margin-top:3px}
+.aa{width:40px;height:2px;background:linear-gradient(90deg,var(--teal),transparent);position:relative;flex-shrink:0}
+.aa::after{content:'▶';position:absolute;right:-8px;top:-8px;font-size:10px;color:var(--teal)}
+
+/* LIVE PANEL */
+.live-panel{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:1.5rem;margin-top:2rem}
+.live-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:12px}
+.live-title{font-family:var(--fd);font-size:14px;color:var(--teal-l)}
+.live-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem}
+.ls-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem;text-align:center}
+.ls-val{font-family:var(--fd);font-size:1.75rem;font-weight:700;line-height:1}
+.ls-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:.3rem}
+.chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem;height:260px;position:relative}
+
+/* ABOUT */
+.ag{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.ab{color:var(--muted);margin-bottom:1.5rem}
+.cl{display:flex;flex-wrap:wrap;gap:8px;margin-top:1.5rem}
+.cb{font-size:11px;padding:4px 12px;border-radius:12px;background:rgba(0,180,216,.08);border:1px solid var(--border);color:var(--teal-l)}
+.cc{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:2rem}
+.cr{display:flex;align-items:center;gap:12px;padding:.75rem 0;border-bottom:1px solid var(--border)}
+.cr:last-child{border-bottom:none}
+.ci{width:36px;height:36px;border-radius:var(--r);background:rgba(0,180,216,.1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.cil{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.civ{font-size:13px;color:var(--text)}
+.civ a{color:var(--teal)}
+
+/* FOOTER */
+#ftr{background:var(--surface);border-top:1px solid var(--border);padding:2rem 0;text-align:center}
+.fi2{display:flex;flex-direction:column;align-items:center;gap:.75rem}
+.fl{font-family:var(--fd);font-size:13px;color:var(--teal)}
+.fc2{font-size:12px;color:var(--muted)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .hg,.ag{grid-template-columns:1fr}
+  .dm{display:none}
+  .nav{display:none}
+  .af{flex-direction:column}
+  .aa{width:2px;height:30px;background:linear-gradient(180deg,var(--teal),transparent)}
+  .aa::after{content:'▼';right:-5px;top:auto;bottom:-10px}
+  .live-stats{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header id="hdr" role="banner">
+  <div class="hi">
+    <div class="sl">
+      <div class="li">TSF</div>
+      <div>
+        <div class="lt">TSF Monitor Dashboard</div>
+        <div class="ls">SSML · Laurentian University</div>
+      </div>
+    </div>
+    <nav class="nav" aria-label="Primary navigation">
+      <a href="#features">Features</a>
+      <a href="#live">Live Demo</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#about">About</a>
+      <a href="https://github.com/rashed079" class="nc" target="_blank" rel="noopener">GitHub ↗</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="c">
+    <div class="hg">
+      <div>
+        <div class="htag"><span class="pd"></span>Live Sensor Monitoring · Sudbury, ON</div>
+        <h1 class="ht">TSF Real-Time<br><span>Monitoring</span><br>Dashboard</h1>
+        <p class="hd">A production WordPress dashboard delivering live Tailings Storage Facility sensor data — built for the Smart &amp; Sustainable Mining Lab at Laurentian University. Custom PHP theme, REST API, Chart.js, and role-based access control.</p>
+        <div class="ha">
+          <a href="#live" class="btn bp">See Live Demo ↓</a>
+          <a href="https://github.com/rashed079/tsf-dashboard" class="btn bo" target="_blank" rel="noopener">View on GitHub ↗</a>
+        </div>
+      </div>
+      <div aria-hidden="true">
+        <div class="dm">
+          <div class="mb">
+            <div class="md" style="background:#e63946"></div>
+            <div class="md" style="background:#e9c46a;margin-left:4px"></div>
+            <div class="md" style="background:#2dc653;margin-left:4px"></div>
+            <span class="mtl">TSF Monitor — SSML Dashboard</span>
+          </div>
+          <div class="mby">
+            <div class="ms">
+              <div class="mst"><div class="msv" style="color:#2dc653" id="h-wl">74.2m</div><div class="msl">Water Level</div></div>
+              <div class="mst"><div class="msv" style="color:#e9c46a" id="h-pp">98 kPa</div><div class="msl">Pore Pressure</div></div>
+              <div class="mst"><div class="msv" style="color:#00b4d8" id="h-sr">2.1 L/m</div><div class="msl">Seepage Rate</div></div>
+            </div>
+            <div class="mch">
+              <div class="chl">WATER LEVEL — 30D TREND</div>
+              <canvas id="hero-chart" height="70"></canvas>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center">
+              <span class="sb ss" id="status-badge">● System Normal</span>
+              <span class="sb sw">⚠ Sensor 3 Drift</span>
+              <span style="font-size:10px;color:var(--muted);margin-left:auto" id="last-updated">Updated just now</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="sec">
+  <div class="c">
+    <p class="sl2">What It Does</p>
+    <h2 class="st">Built for <span>Real-World</span> Mining Safety</h2>
+    <p class="sdesc">Every component was designed for operational realities — real data, real thresholds, real consequences.</p>
+    <div class="fg">
+      <div class="fc"><div class="fi">📡</div><h3 class="ft">Live IoT Sensor Integration</h3><p class="fd2">REST API endpoints receive readings from IoT hardware every 30 seconds. Water level, pore pressure, seepage rate, turbidity, and temperature rendered in real time without page reload.</p></div>
+      <div class="fc"><div class="fi">📊</div><h3 class="ft">Chart.js Data Visualization</h3><p class="fd2">Interactive time-series charts built with Chart.js, polling the WordPress REST API. 30-day trend lines, threshold markers, multi-sensor overlays, and anomaly highlighting.</p></div>
+      <div class="fc"><div class="fi">🔐</div><h3 class="ft">Role-Based Access Control</h3><p class="fd2">Custom WordPress user roles: Researchers see raw data exports; Public users see summarized dashboards; Admins access sensor configuration and alert thresholds.</p></div>
+      <div class="fc"><div class="fi">⚠️</div><h3 class="ft">Threshold Alert System</h3><p class="fd2">ICOLD-inspired threshold logic flags readings as Safe / Warning / Critical. Email alerts via wp_mail() when thresholds are crossed. Alert history logged to custom DB table.</p></div>
+      <div class="fc"><div class="fi">🛡️</div><h3 class="ft">Security Hardening</h3><p class="fd2">Wordfence firewall, SSL enforcement, WP-CLI deployment, nonce-protected API endpoints, application passwords for IoT devices, and WP_DEBUG disabled in production.</p></div>
+      <div class="fc"><div class="fi">🔍</div><h3 class="ft">SEO & Performance</h3><p class="fd2">Yoast SEO, Core Web Vitals optimization (lazy loading, caching, image compression), schema.org markup, and Google Search Console integration. 98+ PageSpeed score.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH STACK -->
+<section class="sec-sm" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="c">
+    <p class="sl2">Technology Stack</p>
+    <h2 class="st" style="font-size:1.5rem">Production-grade tools throughout</h2>
+    <div class="tg">
+      <span class="tp"><span class="tpd"></span>WordPress 6.7</span>
+      <span class="tp"><span class="tpd"></span>Custom PHP Theme</span>
+      <span class="tp"><span class="tpd"></span>WP REST API</span>
+      <span class="tp"><span class="tpd"></span>MySQL Custom Tables</span>
+      <span class="tp"><span class="tpd"></span>Chart.js</span>
+      <span class="tp"><span class="tpd"></span>Elementor</span>
+      <span class="tp"><span class="tpd"></span>JavaScript ES6+</span>
+      <span class="tp"><span class="tpd"></span>PHP 8.x</span>
+      <span class="tp"><span class="tpd"></span>HTML5 / CSS3</span>
+      <span class="tp"><span class="tpd"></span>Wordfence</span>
+      <span class="tp"><span class="tpd"></span>Yoast SEO</span>
+      <span class="tp"><span class="tpd"></span>WP-CLI</span>
+      <span class="tp"><span class="tpd"></span>Git / GitHub</span>
+      <span class="tp"><span class="tpd"></span>SSL / HTTPS</span>
+      <span class="tp"><span class="tpd"></span>IoT Integration</span>
+      <span class="tp"><span class="tpd"></span>Core Web Vitals</span>
+      <span class="tp"><span class="tpd"></span>Application Passwords</span>
+      <span class="tp"><span class="tpd"></span>Role-Based Access</span>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE DEMO -->
+<section id="live" class="sec">
+  <div class="c">
+    <p class="sl2">Interactive Demo</p>
+    <h2 class="st">Simulated <span>Live Feed</span></h2>
+    <p class="sdesc">This simulates the real-time dashboard behaviour — data refreshes every 5 seconds as it would from IoT sensors via the WordPress REST API.</p>
+    <div class="live-panel">
+      <div class="live-header">
+        <span class="live-title">SENSOR-01 · TSF Zone A · Sudbury, ON</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="sb ss" id="live-status">● System Normal</span>
+          <span style="font-size:11px;color:var(--muted)" id="live-time">–</span>
+        </div>
+      </div>
+      <div class="live-stats">
+        <div class="ls-card">
+          <div class="ls-val" id="lv-wl" style="color:var(--safe)">–</div>
+          <div class="ls-lbl">Water Level (m)</div>
+        </div>
+        <div class="ls-card">
+          <div class="ls-val" id="lv-pp" style="color:var(--amber)">–</div>
+          <div class="ls-lbl">Pore Pressure (kPa)</div>
+        </div>
+        <div class="ls-card">
+          <div class="ls-val" id="lv-sr" style="color:var(--teal)">–</div>
+          <div class="ls-lbl">Seepage Rate (L/m)</div>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="live-chart"></canvas>
+      </div>
+      <p style="font-size:11px;color:var(--muted);margin-top:.75rem;text-align:center">
+        Demo simulates IoT sensor → WordPress REST API → Chart.js rendering pipeline. Production instance at SSML, Laurentian University available for live demo on request.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section id="architecture" class="sec" style="background:var(--surface);border-top:1px solid var(--border)">
+  <div class="c">
+    <p class="sl2">System Architecture</p>
+    <h2 class="st">Sensor to Screen <span>Data Flow</span></h2>
+    <p class="sdesc">Clean separation between ingestion, storage, and presentation — built on WordPress APIs throughout.</p>
+    <div class="af" role="img" aria-label="Architecture: IoT Sensors → REST API → MySQL → Chart.js → WordPress Dashboard">
+      <div class="an"><div class="ani">🔌</div><div class="ant">IoT Sensors</div><div class="and">POST every 30s</div></div>
+      <div class="aa"></div>
+      <div class="an"><div class="ani">🌐</div><div class="ant">WP REST API</div><div class="and">/tsf/v1/readings</div></div>
+      <div class="aa"></div>
+      <div class="an"><div class="ani">🗄️</div><div class="ant">MySQL DB</div><div class="and">tsf_readings table</div></div>
+      <div class="aa"></div>
+      <div class="an"><div class="ani">📊</div><div class="ant">Chart.js</div><div class="and">Polls every 30s</div></div>
+      <div class="aa"></div>
+      <div class="an"><div class="ani">🖥️</div><div class="ant">Dashboard</div><div class="and">Role-based WP UI</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- METRICS -->
+<section class="sec">
+  <div class="c">
+    <p class="sl2">Project Outcomes</p>
+    <h2 class="st">Measurable <span>Impact</span></h2>
+    <div class="mg">
+      <div class="mc"><div class="mn">30s</div><div class="mu">refresh interval</div><div class="ml">Live data without page reload</div></div>
+      <div class="mc"><div class="mn">5+</div><div class="mu">sensor streams</div><div class="ml">Water level, pore pressure, seepage, temperature, turbidity</div></div>
+      <div class="mc"><div class="mn">3</div><div class="mu">user roles</div><div class="ml">Admin, Researcher, Public — scoped access</div></div>
+      <div class="mc"><div class="mn">98+</div><div class="mu">PageSpeed score</div><div class="ml">Core Web Vitals optimized</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="sec" style="background:var(--surface);border-top:1px solid var(--border)">
+  <div class="c">
+    <div class="ag">
+      <div>
+        <p class="sl2">The Developer</p>
+        <h2 class="st">Md Rashed Azad <span>Chowdhury</span></h2>
+        <p class="ab">WordPress Web Developer and PMP®-certified project manager based in Sudbury, ON. Currently pursuing MSc in Computational Science at Laurentian University while building production web applications for SSML and CROSH research labs.</p>
+        <p class="ab">12+ years of enterprise IT and digital project delivery across financial services (City Bank PLC, BRAC Bank PLC) — bringing technical depth and financial-sector discipline to every web project.</p>
+        <div class="cl">
+          <span class="cb">PMP®</span><span class="cb">CBAP®</span><span class="cb">ITIL V3</span><span class="cb">ISO 27001</span><span class="cb">Lean Six Sigma BB</span>
+        </div>
+      </div>
+      <div class="cc">
+        <div class="cr"><div class="ci">📍</div><div><div class="cil">Location</div><div class="civ">Greater Sudbury, ON, Canada</div></div></div>
+        <div class="cr"><div class="ci">📧</div><div><div class="cil">Email</div><div class="civ"><a href="mailto:rashed06cse@gmail.com">rashed06cse@gmail.com</a></div></div></div>
+        <div class="cr"><div class="ci">💼</div><div><div class="cil">LinkedIn</div><div class="civ"><a href="https://linkedin.com/in/rashed-azad" target="_blank" rel="noopener">linkedin.com/in/rashed-azad</a></div></div></div>
+        <div class="cr"><div class="ci">🐙</div><div><div class="cil">GitHub</div><div class="civ"><a href="https://github.com/rashed079" target="_blank" rel="noopener">github.com/rashed079</a></div></div></div>
+        <div class="cr"><div class="ci">🎓</div><div><div class="cil">Institution</div><div class="civ">Laurentian University — MSc Computational Science</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer id="ftr">
+  <div class="c">
+    <div class="fi2">
+      <div class="fl">TSF Monitor · SSML · Laurentian University</div>
+      <p class="fc2">Built by <a href="https://linkedin.com/in/rashed-azad" target="_blank" rel="noopener">Md Rashed Azad Chowdhury</a> — WordPress Web Developer · PMP® · ITIL V3 · ISO 27001</p>
+      <p class="fc2">&copy; 2025 Smart &amp; Sustainable Mining Lab, Laurentian University, Sudbury, ON</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── Simulated sensor data ──────────────────────────────────
+const BASE = { wl: 74.2, pp: 98, sr: 2.1 };
+const history = { wl: [], pp: [], labels: [] };
+let liveChart = null;
+
+function simulate() {
+  const wl = +(BASE.wl + (Math.random() - 0.5) * 0.6).toFixed(2);
+  const pp = +(BASE.pp + (Math.random() - 0.5) * 8).toFixed(1);
+  const sr = +(BASE.sr + (Math.random() - 0.5) * 0.4).toFixed(2);
+  const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+  // Update hero stats
+  document.getElementById('h-wl').textContent = wl + 'm';
+  document.getElementById('h-pp').textContent = pp + ' kPa';
+  document.getElementById('h-sr').textContent = sr + ' L/m';
+  document.getElementById('last-updated').textContent = 'Updated ' + now;
+
+  // Update live panel stats
+  document.getElementById('lv-wl').textContent = wl + 'm';
+  document.getElementById('lv-pp').textContent = pp + ' kPa';
+  document.getElementById('lv-sr').textContent = sr + ' L/m';
+  document.getElementById('live-time').textContent = now;
+
+  // Status logic
+  let statusText = '● System Normal', statusClass = 'sb ss';
+  if (wl > 76 || pp > 115) { statusText = '⚠ Warning Threshold'; statusClass = 'sb sw'; }
+  if (wl > 78 || pp > 130) { statusText = '🚨 Critical Alert'; statusClass = 'sb sd'; }
+  ['status-badge','live-status'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = statusText; el.className = statusClass; }
+  });
+
+  // History (keep last 20)
+  history.wl.push(wl); history.pp.push(pp); history.labels.push(now);
+  if (history.wl.length > 20) { history.wl.shift(); history.pp.shift(); history.labels.shift(); }
+
+  if (liveChart) {
+    liveChart.data.labels = [...history.labels];
+    liveChart.data.datasets[0].data = [...history.wl];
+    liveChart.data.datasets[1].data = [...history.pp];
+    liveChart.update('none');
+  }
+}
+
+// ── Hero sparkline chart ──────────────────────────────────
+function initHeroChart() {
+  const canvas = document.getElementById('hero-chart');
+  if (!canvas) return;
+  const data = [70.1,70.3,70.8,71.2,71.0,71.5,72.0,71.8,72.3,72.8,73.0,73.2,73.5,73.1,73.6,74.0,73.8,74.2,74.5,74.3,74.1,74.6,74.8,74.2,73.9,74.1,74.5,74.2,74.0,74.2];
+  new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: data.map((_,i) => 'Day '+(i+1)),
+      datasets: [{ data, borderColor: '#00b4d8', backgroundColor: 'rgba(0,180,216,0.08)', borderWidth: 2, pointRadius: 0, fill: true, tension: 0.4 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { display: false },
+        y: { display: true, grid: { color: 'rgba(0,180,216,0.06)' }, ticks: { color: '#8ab4c2', font: { size: 9 }, maxTicksLimit: 4 } }
+      },
+      animation: { duration: 1200, easing: 'easeInOutQuart' }
+    }
+  });
+}
+
+// ── Live chart ────────────────────────────────────────────
+function initLiveChart() {
+  const canvas = document.getElementById('live-chart');
+  if (!canvas) return;
+  liveChart = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Water Level (m)', data: [], borderColor: '#00b4d8', backgroundColor: 'rgba(0,180,216,0.06)', borderWidth: 2, pointRadius: 2, fill: true, tension: 0.4, yAxisID: 'y' },
+        { label: 'Pore Pressure (kPa)', data: [], borderColor: '#e9c46a', backgroundColor: 'rgba(233,196,106,0.06)', borderWidth: 2, pointRadius: 2, fill: false, tension: 0.4, yAxisID: 'y1' }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { labels: { color: '#caf0f8', font: { size: 12 }, boxWidth: 12, padding: 16 } } },
+      scales: {
+        x: { ticks: { color: '#8ab4c2', font: { size: 10 } }, grid: { color: 'rgba(0,180,216,0.06)' } },
+        y: { type: 'linear', position: 'left', ticks: { color: '#00b4d8' }, grid: { color: 'rgba(0,180,216,0.06)' }, title: { display: true, text: 'Water Level (m)', color: '#00b4d8', font: { size: 11 } } },
+        y1: { type: 'linear', position: 'right', ticks: { color: '#e9c46a' }, grid: { drawOnChartArea: false }, title: { display: true, text: 'Pore Pressure (kPa)', color: '#e9c46a', font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+// ── Scroll header effect ──────────────────────────────────
+window.addEventListener('scroll', () => {
+  document.getElementById('hdr').style.background = window.scrollY > 60
+    ? 'rgba(10,10,30,.97)' : 'rgba(10,10,30,.88)';
+}, { passive: true });
+
+// ── Init ──────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  initHeroChart();
+  initLiveChart();
+  // Seed some initial data then start polling
+  for (let i = 0; i < 10; i++) simulate();
+  setInterval(simulate, 5000);
+});
+</script>
+</body>
+</html>
